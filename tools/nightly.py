@@ -133,6 +133,7 @@ def build_and_share():
 def share_zips():
     """the release zips onto the share under their lasting names, each copied whole under a temporary name, checked
     byte for byte and renamed into place: a player downloading during the copy gets the old file, never half a new one"""
+    if not SHARE: note('- no share_dir in config.local.json: the zips stay in client/release/'); return
     ver = re.search(r'ADDON_VERSION = "([^"]+)"', open(f'{CLIENT}/addon/LivingVoices/LivingVoices.lua').read()).group(1)
     # (2026-10-31) the portal serves the share's two zips to every player: an engine (LivingVoices.dll) the producer has
     # not run on Windows goes to the share as a TEST update only, until its version is in client/ENGINE_TESTED
