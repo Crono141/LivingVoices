@@ -13,8 +13,8 @@ Living Voices is the result. It is a full voice-over for the Wrath of the Lich K
 - Every line was **directed** by a language model, **performed** by a speech model, **checked by software** for wrong
   words, bad pauses, rushed stops and held sounds, and **retaken** until it passed. A human producer listened only to
   the lines that failed six takes in a row.
-- On the client side: an add-on, a small playback engine (the stock client cannot stop a sound once it starts), and a
-  one-file archive of the lines at 64 kbps (3.6 GB).
+- On the client side: an add-on, a small playback engine (the stock client cannot stop a sound once it starts), and the
+  lines at 64 kbps in two archives (3.6 GB).
 
 This repository is the pipeline and the client, with the methods we settled on and what we tried before them. It
 contains **no Blizzard text or audio**: the game's quest text, recordings and sounds are read from your own client
@@ -39,7 +39,7 @@ decision was made and why.
 | Render speed per card | about 1.16x real time (IndexTTS-2, one beam) |
 | Takes that failed the automatic check, first attempt | 16-20% for whole lines (October), 3-8% for race/class clips |
 | Lines sent to the producer after six failed takes | about 3.8% of the main pass; every one resolved for 1.1.1 |
-| Release 1.1.1 | 48,691 files in one MPQ, 3.64 GB zip |
+| Release 1.1.1 | 48,691 files in two MPQs, 3.6 GB in two zips |
 
 The single most useful finding: **automatic retakes are cheap, a human listening is not.** Every check was tuned to
 send a doubtful take to another seed rather than to the producer, and a line was accepted as good enough once it had
@@ -328,12 +328,14 @@ splicing at playback adds 0.8 GB.
 
 ### 12. Packaging
 
-**What we use.** All lines in one MPQ in the add-on's folder (`vo\<line>.mp3`), written by `client/build/mkpack` and
-read back in full through the engine's own reader before anything is zipped. 64 kbps MP3: in a blind test the producer
+**What we use.** All lines in MPQ archives in the add-on's folder (`vo\<line>.mp3`), written by `client/build/mkpack`
+and read back in full through the engine's own reader before anything is zipped. They are split in two
+(`LivingVoices.MPQ`, `LivingVoices.part2.MPQ`) so each release zip stays under GitHub's 2 GiB per file; the engine
+mounts every archive in the folder. 64 kbps MP3: in a blind test the producer
 heard no difference down to 48 kbps ("All bitrates sound the same to me"). Fixes from in-game reports ship as a small
 `LivingVoices.patch.MPQ`, which the engine mounts after the main archive.
 
-**What we tried.** 1.0.0 shipped 21,456 loose files (5.4 GB). One archive is faster to copy, and an antivirus scans one
+**What we tried.** 1.0.0 shipped 21,456 loose files (5.4 GB). An archive is faster to copy, and an antivirus scans one
 file, not twenty-four thousand.
 
 ---

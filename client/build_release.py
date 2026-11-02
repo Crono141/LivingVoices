@@ -67,9 +67,21 @@ lst = os.path.join(OUT, '..', f'.LivingVoices-{VERSION}.list')
 with open(lst, 'w') as f:
     f.write('render64/783-accept.mp3\ttest.mp3\n')                  # /lv test: "Your first task..." (Marshal McBride)
     for nm in sorted(vo): f.write(f'render64/{nm}.mp3\tvo\\{nm}.mp3\n')
-mpq = f'{AD}/LivingVoices.MPQ'
-if subprocess.run([f'{CLIENT}/build/mkpack', mpq, lst]).returncode: sys.exit('mkpack failed; the release was not zipped')
-if subprocess.run([f'{CLIENT}/build/test_pack', lst, mpq]).returncode: sys.exit('the MPQ does not read back; the release was not zipped')
+# (1.1.1, GitHub releases) the lines in TWO archives, each zip under GitHub's 2 GiB per file: LivingVoices.MPQ and
+# LivingVoices.part2.MPQ, split by size in name order. The engine mounts every *.MPQ in the folder; no line is in both,
+# and both names sort before LivingVoices.patch.MPQ ('.M' and '.pa'r before '.pa't), so a patch still wins.
+PARTS = (('LivingVoices.MPQ', f'{lst}.1'), ('LivingVoices.part2.MPQ', f'{lst}.2'))
+rows = [l for l in open(lst)]
+sizes = [os.path.getsize(l.split('\t')[0]) for l in rows]
+half, run, cut = sum(sizes) / 2, 0, len(rows)
+for i, n in enumerate(sizes):
+    run += n
+    if run >= half: cut = i + 1; break
+for (name, part), chunk in zip(PARTS, (rows[:cut], rows[cut:])):
+    open(part, 'w').writelines(chunk)
+    m = f'{AD}/{name}'
+    if subprocess.run([f'{CLIENT}/build/mkpack', m, part]).returncode: sys.exit(f'mkpack failed on {name}; the release was not zipped')
+    if subprocess.run([f'{CLIENT}/build/test_pack', part, m]).returncode: sys.exit(f'{name} does not read back; the release was not zipped')
 # (1.1.0) the patch archive. release/.LivingVoices-<version>.base.json records every file of the archive as this version
 # first shipped (written by the first build of the version); a line re-rendered since goes into LivingVoices.patch.MPQ,
 # which the engine mounts after LivingVoices.MPQ (by name: '.p' sorts after '.M') so its lines win. The update zip
@@ -153,11 +165,9 @@ with open(f'{AD}/Index.lua', 'w') as f:
     f.write('  },\n}\n')
 if subprocess.run(['luac5.1', '-p', f'{AD}/Index.lua', f'{AD}/LivingVoices.lua']).returncode:
     sys.exit('Lua does not parse; the release was not zipped')
+# (2026-11-02, public) the source is the GitHub repository (LICENSES.txt says where), not a src/ folder in the zip
 for f in ('build/LivingVoices.dll', 'build/LivingVoicesPatcher.exe', 'patch_wowexe.py', 'README.txt', 'LICENSES.txt'):
     shutil.copy(f'{CLIENT}/{f}', OUT)
-os.makedirs(f'{OUT}/src')
-for f in ('LivingVoices.cpp', 'lv_pack.h', 'mkpack.cpp', 'test_pack.cpp', 'LivingVoicesPatcher.cpp', 'patch_bytes.h', 'build.sh'):
-    shutil.copy(f'{CLIENT}/{f}', f'{OUT}/src')
 
 z = f'{OUT}.zip'
 if os.path.exists(z): os.remove(z)
@@ -166,6 +176,18 @@ with zipfile.ZipFile(z, 'w', zipfile.ZIP_STORED, allowZip64=True) as zf:   # the
         for fn in sorted(files):
             p = os.path.join(root, fn); arc = os.path.relpath(p, os.path.dirname(OUT))
             zf.write(patch_full if fn == 'LivingVoices.patch.MPQ' else p, arc)      # the empty patch in the full zip
+# (1.1.1) the same, as two downloads under GitHub's 2 GiB limit: part 1 is everything but the second archive, part 2
+# only that archive, at the same path (unzipped over part 1 it lands beside LivingVoices.MPQ)
+GIB2 = 2 * 1024 ** 3
+for zp, keep in ((f'{OUT}-part1.zip', lambda fn: fn != 'LivingVoices.part2.MPQ'), (f'{OUT}-part2.zip', lambda fn: fn == 'LivingVoices.part2.MPQ')):
+    if os.path.exists(zp): os.remove(zp)
+    with zipfile.ZipFile(zp, 'w', zipfile.ZIP_STORED, allowZip64=True) as zf:
+        for root, _, files in os.walk(OUT):
+            for fn in sorted(files):
+                if not keep(fn): continue
+                p = os.path.join(root, fn); zf.write(patch_full if fn == 'LivingVoices.patch.MPQ' else p, os.path.relpath(p, os.path.dirname(OUT)))
+    if os.path.getsize(zp) >= GIB2: sys.exit(f'{zp} is {os.path.getsize(zp) / 1e9:.2f} GB, over GitHub\'s 2 GiB per file')
+    print(f'release part -> {zp} ({os.path.getsize(zp) / 1e9:.2f} GB)')
 # (1.1.0, the producer) the small files alone -- engine, patcher, add-on and its index, docs; no LivingVoices.MPQ -- for
 # an install that already has this version's archive: a DLL or add-on fix without re-copying 2.8 GB
 zu = f'{OUT}-update.zip'
@@ -173,7 +195,7 @@ if os.path.exists(zu): os.remove(zu)
 with zipfile.ZipFile(zu, 'w', zipfile.ZIP_DEFLATED) as zf:
     for root, _, files in os.walk(OUT):
         for fn in sorted(files):
-            if fn == 'LivingVoices.MPQ': continue                                   # the 2.8 GB base stays out
+            if fn in ('LivingVoices.MPQ', 'LivingVoices.part2.MPQ'): continue       # the base archives stay out
             p = os.path.join(root, fn); zf.write(p, os.path.relpath(p, os.path.dirname(OUT)))
 print(f'update (no base MPQ; patch MPQ with {len(changed)} line(s)) -> {zu} ({os.path.getsize(zu) / 1e6:.1f} MB)')
 print(f'{len(vo)} lines ({sum(1 for n in vo if n.startswith("g"))} chat), {len(titles)} quest titles, {len(gossip)} chatting NPCs, {len(missing)} missing -> {z} ({os.path.getsize(z) / 1e9:.2f} GB)')

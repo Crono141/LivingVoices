@@ -12,8 +12,9 @@ Install (keep the game closed):
     Wow.exe.stock. (No Windows? patch_wowexe.py does the same with Python: python3 patch_wowexe.py Wow.exe)
  4. Start the game. Chat says "Living Voices: engine 0.4 ready." once you log in.
 
-The lines are in one archive, Interface\AddOns\LivingVoices\LivingVoices.MPQ (3.6 GB). Keep it where it is; the
-engine reads it from there.
+The lines are in two archives in Interface\AddOns\LivingVoices: LivingVoices.MPQ and LivingVoices.part2.MPQ (3.6 GB
+together; the GitHub release ships them as two zips, part1 and part2 -- unzip both into the same place). Keep them
+where they are; the engine reads every .MPQ in that folder.
 
 Settings:
  - Interface -> Sound & Voice -> Sound: a "Voice" slider under Ambience sets the voice-over volume; the box beside
