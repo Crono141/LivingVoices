@@ -21,8 +21,10 @@ i686-w64-mingw32-g++ -std=c++17 -O2 -shared -mstackrealign -fno-exceptions -fno-
 i686-w64-mingw32-strip build/LivingVoices.dll
 ls -la build/LivingVoices.dll
 # the Wow.exe patcher for players without Python (the same bytes as patch_wowexe.py; patch_bytes.h)
+# its manifest (asInvoker) keeps Windows from asking for admin rights because the name says "patch"
+i686-w64-mingw32-windres LivingVoicesPatcher.rc -O coff -o build/LivingVoicesPatcher.res
 i686-w64-mingw32-g++ -std=c++17 -O2 -Wall -static -static-libgcc -static-libstdc++ \
-    -o build/LivingVoicesPatcher.exe LivingVoicesPatcher.cpp -ladvapi32
+    -o build/LivingVoicesPatcher.exe LivingVoicesPatcher.cpp build/LivingVoicesPatcher.res -ladvapi32
 i686-w64-mingw32-strip build/LivingVoicesPatcher.exe
 ls -la build/LivingVoicesPatcher.exe
 # Linux: write the MPQ (build_release.py runs it) and read every line back through the DLL's own reader
