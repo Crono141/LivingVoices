@@ -299,32 +299,38 @@ local function issueURL(r, more)
     return u
 end
 local copyFrame
+-- (2026-11-02) a MULTI-line edit box in a scroll frame: a single-line one selects the text but, on some older
+-- clients, Ctrl+C never reaches the system clipboard (other add-ons' fix); the text is selected after the focus
 local function showCopy(text, title)
     if not copyFrame then
         local f = CreateFrame("Frame", "LivingVoicesCopyFrame", UIParent)
-        f:SetWidth(580); f:SetHeight(130); f:SetPoint("CENTER", 0, 140); f:SetFrameStrata("DIALOG")
+        f:SetWidth(600); f:SetHeight(220); f:SetPoint("CENTER", 0, 120); f:SetFrameStrata("DIALOG")
         f:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
                         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32,
                         insets = { left = 11, right = 12, top = 12, bottom = 11 } })
         f:EnableMouse(true); f:SetMovable(true); f:RegisterForDrag("LeftButton")
         f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
         f.title = f:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-        f.title:SetPoint("TOP", 0, -20); f.title:SetWidth(540)
-        local eb = CreateFrame("EditBox", "LivingVoicesCopyBox", f, "InputBoxTemplate")
-        eb:SetWidth(520); eb:SetHeight(20); eb:SetPoint("TOP", f.title, "BOTTOM", 0, -12)
-        eb:SetAutoFocus(true); eb:SetMaxLetters(0)
+        f.title:SetPoint("TOP", 0, -20); f.title:SetWidth(560)
+        local sf = CreateFrame("ScrollFrame", "LivingVoicesCopyScroll", f, "UIPanelScrollFrameTemplate")
+        sf:SetPoint("TOPLEFT", 24, -64); sf:SetPoint("BOTTOMRIGHT", -40, 48)
+        local eb = CreateFrame("EditBox", "LivingVoicesCopyBox", sf)
+        eb:SetMultiLine(true); eb:SetFontObject(ChatFontNormal); eb:SetWidth(530); eb:SetAutoFocus(false); eb:SetMaxLetters(0)
+        sf:SetScrollChild(eb)
         eb:SetScript("OnEscapePressed", function() f:Hide() end)
-        eb:SetScript("OnEnterPressed", function() f:Hide() end)
-        eb:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
         eb:SetScript("OnTextChanged", function(self) if self:GetText() ~= f.text then self:SetText(f.text); self:HighlightText() end end)
         f.eb = eb
+        f.hint = f:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+        f.hint:SetPoint("BOTTOMLEFT", 22, 22); f.hint:SetWidth(440); f.hint:SetJustifyH("LEFT")
         local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-        b:SetWidth(90); b:SetHeight(22); b:SetPoint("BOTTOM", 0, 16); b:SetText(CLOSE or "Close")
+        b:SetWidth(90); b:SetHeight(22); b:SetPoint("BOTTOMRIGHT", -20, 16); b:SetText(CLOSE or "Close")
         b:SetScript("OnClick", function() f:Hide() end)
         tinsert(UISpecialFrames, "LivingVoicesCopyFrame")       -- Escape closes it
         copyFrame = f
     end
     copyFrame.text = text; copyFrame.title:SetText(title); copyFrame:Show()
+    copyFrame.hint:SetText("Copy not working? The report is also saved in WTF\\Account\\<account>\\SavedVariables\\LivingVoices.lua,"
+        .. " or open github.com/Crono141/LivingVoices/issues and type the line's name.")
     copyFrame.eb:SetText(text); copyFrame.eb:SetFocus(); copyFrame.eb:HighlightText()
 end
 local function offerGitHub(list)
