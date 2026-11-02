@@ -1,0 +1,12 @@
+# Template: replace /path/to/LivingVoices and /path/to/ComfyUI (see README.md here), then install to ~/.config/systemd/user/
+[Unit]
+Description=Living Voices nightly run (tools/nightly.py: reports, review marks, rendering 01:00-09:00, splices, build)
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/LivingVoices/data
+ExecStart=/path/to/ComfyUI/venv/bin/python -W ignore /path/to/LivingVoices/tools/nightly.py
+StandardOutput=append:/path/to/LivingVoices/data/overnight_reports/nightly.log
+StandardError=append:/path/to/LivingVoices/data/overnight_reports/nightly.log
+TimeoutStartSec=infinity
+Restart=no

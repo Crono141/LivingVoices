@@ -1,0 +1,10 @@
+[Unit]
+Description=Living Voices nightly run at 01:00 (in-game reports on Sundays)
+
+[Timer]
+OnCalendar=*-*-* 01:00:00
+Persistent=false
+Unit=wow-voiceover.service
+
+[Install]
+WantedBy=timers.target

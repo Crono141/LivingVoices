@@ -1,0 +1,18 @@
+{
+ "_note": "A character's own-voice reference chosen by ear over plan_v3.py's single-clip pick (2026-10-30). Thrall: one 10 s Wrathgate battle clip came out a generic orc; 15 s of his Warcraft III orc-campaign dialogue won over 15 s of his WoW clips. Jaina (her one Culling of Stratholme clip was poor: \"much better delivery\") and Varian: ~20 s of their own WoW clips. Kept on their one clip by ear: Thassarian, Darion Mograine, Brann, Sylvanas, Thorim, Tirion, Alexstrasza, Drakuru -- a longer reference full of shouting gives the line \"that distant shout sort of timbre\". Yelled single clips (creature_text Type 14) replaced by the calmest of the character's own clips -- a said line first, else the least shouted, dying words last: the producer's round of five, 2026-10-30, \"everyone else is better calm\". Keristrasza keeps her yell (the producer's pick); Razuvious has no other clip. Kept on their yell: Prince Keleseth (his only other clip is an emote, a cackle), Bolvar and Noth (no other clip of speaking length).",
+ "Thrall": "clone_refs/thrall_wc3.wav",
+ "Lady Jaina Proudmoore": "clone_refs/own/proudmoore_wow.wav",
+ "King Varian Wrynn": "clone_refs/own/wrynn_wow.wav",
+ "Akama": "game_voices/Akama/BLCKTMPLE_Akama_PreFight01.wav",
+ "Varimathras": "game_voices/Varimathras/WG_Varimathras_HOR05.wav",
+ "Captain Rupert": "game_voices/Captain_Rupert/IC_Captain_Rupert_Event02.wav",
+ "Eadric the Pure": "game_voices/Eadric_the_Pure/AC_Eadric_Intro01.wav",
+ "Crok Scourgebane": "game_voices/Crok_Scourgebane/IC_Crok_Event01.wav",
+ "Captain Grondel": "game_voices/Captain_Grondel/IC_Captain_Grondel_Survived01.wav",
+ "Captain Brandon": "game_voices/Captain_Brandon/IC_Captain_Brandon_Survived01.wav",
+ "Captain Arnath": "game_voices/Captain_Arnath/IC_Arnath_Event03.wav",
+ "Kalecgos": "game_voices/Kalecgos/GOODKALECGOSWIN.wav",
+ "Gothik the Harvester": "game_voices/Gothik_the_Harvester/GOT_NAXX_TLPRT.wav",
+ "Baron Rivendare": "game_voices/Baron_Rivendare/RIVENDARETAUNT03.wav",
+ "Valithria Dreamwalker": "game_voices/Valithria_Dreamwalker/IC_Valithria_DWOpen01.wav"
+}

@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: Living Voices
+## Notes: Quest voice-over for every quest giver on the realm, and what they say when you talk to them. Needs LivingVoices.dll and the patched Wow.exe.
+## Version: 1.1.1
+## SavedVariables: LivingVoicesSettings, LivingVoicesReports
+## SavedVariablesPerCharacter: LivingVoicesDB
+Index.lua
+LivingVoices.lua

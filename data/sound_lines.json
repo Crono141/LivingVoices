@@ -1,0 +1,21 @@
+{
+ "_note": "Lines with no words: built from client sounds, one per sentence (tools/sound_lines.py). The Winterfin murlocs' chat text is murloc speech (2026-10-30, the producer).",
+ "g25205t12354s0-gossip": [
+  "Sound\\Creature\\Murloc\\mMurlocAggroA.wav"
+ ],
+ "g25206t12343s0-gossip": [
+  "Sound\\Creature\\Murloc\\mMurlocFidget2a.wav",
+  "Sound\\Creature\\Murloc\\mMurlocFidget3a.wav",
+  "Sound\\Creature\\Murloc\\mMurlocAggroB.wav"
+ ],
+ "g28375t13134s0-gossip": [
+  "Sound\\Creature\\Murloc\\mMurlocFidget2b.wav"
+ ],
+ "g25199t12349s0-gossip": [
+  "Sound\\Creature\\Murloc\\mMurlocAggroC.wav",
+  "Sound\\Creature\\Murloc\\mMurlocPreAggroA.wav"
+ ],
+ "g25208t12360s0-gossip": [
+  "Sound\\Creature\\Murloc\\mMurlocAggroOld.wav"
+ ]
+}

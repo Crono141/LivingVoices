@@ -1,0 +1,39 @@
+{
+ "questId": "783",
+ "accept": {
+  "voice": "npc",
+  "note": "Deputy Willem to the hero; welcoming but weary from duty.",
+  "subtext": "I need your help because our main army is stretched thin, and I'm proud to have you on our side.",
+  "beats": [
+   {
+    "sentences": [
+     1,
+     7
+    ],
+    "text": "I hope you strapped your belt on tight, young hero, because there is work to do here in Northshire. And I don't mean farming. The Stormwind guards are hard pressed to keep the peace here, with so many of us in distant lands and so many threats pressing close. And so we're enlisting the aid of anyone willing to defend their home. And their alliance. If you're here to answer the call, then speak with my superior, Marshal McBride. He's inside the abbey behind me.",
+    "style": "cheerful",
+    "emotion": "warmly welcoming, with a slight dry chuckle at 'farming'",
+    "intensity": 4,
+    "steadied": "The speaker is moving from a general observation about the situation to a specific instruction for the hero."
+   }
+  ]
+ },
+ "complete": {
+  "voice": "npc",
+  "note": "Marshal McBride to the hero; authoritative yet encouraging.",
+  "subtext": "I am pleased by your initiative, but I want you to understand the scale of the struggle ahead.",
+  "beats": [
+   {
+    "sentences": [
+     1,
+     8
+    ],
+    "text": "Ah, good. Another volunteer. We're getting a lot of you these days. I hope it's enough. The human lands are threatened from without, and so many of our forces have been marshaled abroad. This, in turn, leaves room for corrupt and lawless groups to thrive within our borders. It is a many-fronted battle we wage, adventurer. Gird yourself for a long campaign.",
+    "style": "relieved_grateful",
+    "emotion": "approving and steady; a slight hint of hope in his voice",
+    "intensity": 4,
+    "steadied": "The speaker moves from a general observation about the volunteers to a specific explanation of the strategic situation without changing their emotional state."
+   }
+  ]
+ }
+}

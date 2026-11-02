@@ -1,0 +1,9 @@
+questId,kind,variant,npc_id,npc_name,race,sex,family,action,source_pack,match_tier,file_in_pack,clone_ref,tempo,words
+7,accept,,197,Marshal McBride,Human,male,ours,generate,,ours,,design:human_male,,41
+7,complete,,197,Marshal McBride,Human,male,ours,generate,,ours,,design:human_male,,36
+7,progress,,197,Marshal McBride,Human,male,ours,generate,,ours,,design:human_male,,12
+33,accept,,196,Eagan Peltskinner,Human,male,ours,generate,,ours,,design:human_male,,62
+33,complete,,196,Eagan Peltskinner,Human,male,ours,generate,,ours,,design:human_male,,25
+33,progress,,196,Eagan Peltskinner,Human,male,ours,generate,,ours,,design:human_male,,10
+783,accept,,823,Deputy Willem,Human,male,ours,generate,,ours,,design:human_male,,85
+783,complete,,197,Marshal McBride,Human,male,ours,generate,,ours,,design:human_male,,62

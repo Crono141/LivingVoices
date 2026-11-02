@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice-over Review</title>
+<style>
+:root {
+  --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #e2e0da;
+  --accent: #2f6db5; --accent-ink: #ffffff; --sel: #e8f0fa;
+  --ok: #2e7d4f; --ok-bg: #e3f2e8; --warn: #9a6400; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2;
+  --gap: #c2410c; --gap-bg: #ffedd5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe7; --muted: #a09e98; --line: #34332f;
+    --accent: #6ea3e6; --accent-ink: #0d1520; --sel: #22303f;
+    --ok: #7fd1a0; --ok-bg: #1d3326; --warn: #f0c060; --warn-bg: #3a2f17; --bad: #f4908a; --bad-bg: #3d1f1d;
+    --gap: #fdba74; --gap-bg: #3b2414;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --panel: #1f1f1d; --ink: #ecebe7; --muted: #a09e98; --line: #34332f;
+  --accent: #6ea3e6; --accent-ink: #0d1520; --sel: #22303f;
+  --ok: #7fd1a0; --ok-bg: #1d3326; --warn: #f0c060; --warn-bg: #3a2f17; --bad: #f4908a; --bad-bg: #3d1f1d;
+  --gap: #fdba74; --gap-bg: #3b2414;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding: 12px 16px 10px; }
+.top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; }
+h1 { font-size: 18px; margin: 0; }
+.counts { color: var(--muted); font-size: 13px; }
+.counts b { color: var(--ink); font-weight: 600; }
+.bar { height: 4px; background: var(--line); border-radius: 2px; margin: 8px 0; overflow: hidden; }
+.bar > div { height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+input[type=search] { flex: 1 1 160px; min-width: 120px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 4px 8px; font: inherit; font-size: 13px; }
+.keys { color: var(--muted); font-size: 12px; margin-top: 6px; }
+kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; font: 11px ui-monospace, monospace; background: var(--panel); }
+main { padding: 12px 16px 80px; max-width: 1100px; margin: 0 auto; }
+.row { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; scroll-margin-top: 150px; }
+.row.sel { outline: 2px solid var(--accent); background: var(--sel); }
+.row.decided { opacity: .62; }
+.row.sel.decided { opacity: 1; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+.who { font-weight: 600; font-size: 14px; }
+.name { color: var(--muted); font: 12px ui-monospace, monospace; }
+.badge { border-radius: 4px; padding: 1px 6px; font-size: 12px; font-weight: 600; }
+.f-low { background: var(--bad-bg); color: var(--bad); } .f-dropped { background: var(--warn-bg); color: var(--warn); }
+.f-slow { background: var(--warn-bg); color: var(--warn); } .f-odd { background: var(--gap-bg); color: var(--gap); }
+.d-accept { background: var(--ok-bg); color: var(--ok); } .d-retry { background: var(--warn-bg); color: var(--warn); } .d-closer { background: var(--sel); color: var(--accent); }
+.text { margin: 6px 0 2px; overflow-wrap: anywhere; }
+.pause { display: inline-block; background: var(--gap-bg); color: var(--gap); border-radius: 3px; padding: 0 3px; margin: 0 2px; font-size: 12px; font-weight: 600; }
+.heard { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.heard span { font-weight: 600; }
+.controls { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 8px; }
+audio { height: 32px; max-width: 100%; flex: 1 1 260px; }
+.takes { display: flex; flex-wrap: wrap; gap: 4px; }
+.take { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 5px; padding: 2px 7px; font-size: 12px; cursor: pointer; }
+.take.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.take.best::after { content: " ★"; color: var(--accent); }
+.take small { color: var(--muted); }
+.decide { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 4px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.btn.accept[aria-pressed="true"] { background: var(--ok); color: var(--panel); border-color: var(--ok); }
+.btn.retry[aria-pressed="true"] { background: var(--warn); color: var(--panel); border-color: var(--warn); }
+.btn.closer[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.note { flex: 1 1 200px; min-width: 140px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 4px 8px; font: inherit; font-size: 13px; }
+.saved { font-size: 12px; color: var(--muted); min-width: 50px; }
+.empty { color: var(--muted); text-align: center; padding: 40px 0; }
+.ctx { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.ctx b { color: var(--ink); font-weight: 600; }
+details.more { margin-top: 6px; font-size: 13px; }
+details.more summary { cursor: pointer; color: var(--accent); width: fit-content; }
+.qt { border-left: 3px solid var(--line); padding: 2px 0 2px 8px; margin: 6px 0; overflow-wrap: anywhere; }
+.qt.this { border-left-color: var(--accent); }
+.qt .k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); display: block; }
+.dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 10px; margin-top: 6px; }
+.dl dt { color: var(--muted); } .dl dd { margin: 0; overflow-wrap: anywhere; }
+.tabs { display: flex; gap: 4px; margin-top: 8px; }
+.tab { border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); padding: 4px 10px; font: inherit; font-size: 14px; cursor: pointer; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.hidden { display: none !important; }
+.snote { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+.snote b { color: var(--ink); }
+h2 { font-size: 15px; margin: 18px 0 8px; }
+.sn { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; }
+.sn.picked { outline: 2px solid var(--ok); background: var(--ok-bg); }
+.sn .src { font-size: 13px; overflow-wrap: anywhere; } .sn .src small { color: var(--muted); }
+.sn .plays { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 1 / -1; }
+.sn .plays .btn { padding: 3px 10px; }
+.btn.use[aria-pressed="true"] { background: var(--ok); color: var(--panel); border-color: var(--ok); }
+.btn.playing { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+@media (max-width: 600px) { .keys { display: none; } header { padding: 10px 16px 8px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>Voice-over review</h1><div class="counts" id="counts">loading…</div></div>
+  <div class="tabs" role="tablist"><button class="tab" role="tab" data-tab="lines" aria-selected="true">Lines</button><button class="tab" role="tab" data-tab="compare" aria-selected="false">Voice tests</button></div>
+  <div id="lineTools">
+  <div class="bar"><div id="progress"></div></div>
+  <div class="filters" id="filters">
+    <button class="chip" data-f="all" aria-pressed="true">All</button>
+    <button class="chip" data-f="low score">Low score</button>
+    <button class="chip" data-f="dropped">Dropped word</button>
+    <button class="chip" data-f="slow">Slow</button>
+    <button class="chip" data-f="odd pause">Odd pause</button>
+    <button class="chip" data-f="odd delivery">Odd delivery</button>
+    <button class="chip" data-f="missed stop">Missed stop</button>
+    <button class="chip" data-f="mispronounced">Mispronounced</button>
+    <button class="chip" data-f="reported in game">Reported in game</button>
+    <button class="chip" id="undecided" aria-pressed="false">Undecided only</button>
+    <input type="search" id="search" placeholder="Search NPC, quest, zone, race or text">
+  </div>
+  <div class="keys"><kbd>j</kbd>/<kbd>k</kbd> next/previous · <kbd>space</kbd> play/pause · <kbd>1</kbd>–<kbd>6</kbd> play that seed's take · <kbd>a</kbd> accept the take playing · <kbd>r</kbd> retry · <kbd>l</kbd> look closer · <kbd>c</kbd> context · <kbd>u</kbd> undo · <kbd>n</kbd> note</div>
+  </div>
+</header>
+<main id="list"><div class="empty">Loading the review lines…</div></main>
+<main id="compare" class="hidden"><div class="empty">Loading the voice tests…</div></main>
+<script>
+const FAULT = {'reported in game': ['f-low', 'Reported in game'], 'low score': ['f-low', 'Low score'], 'dropped': ['f-dropped', 'Dropped word'], 'slow': ['f-slow', 'Slow'], 'odd pause': ['f-odd', 'Odd pause'], 'odd delivery': ['f-odd', 'Odd delivery'], 'missed stop': ['f-odd', 'Missed stop'], 'mispronounced': ['f-odd', 'Mispronounced']};
+const DEC = {'accept': ['d-accept', 'Accepted'], 'retry': ['d-retry', 'Retry'], 'look closer': ['d-closer', 'Look closer']};
+const KIND = {accept: 'Accept (quest offered)', progress: 'Progress (quest not done yet)', complete: 'Complete (quest handed in)'};
+const qtext = t => esc(t).replace(/\$[bB]/g, '<br>').replace(/\$[nN]/g, '‹name›').replace(/\$[cC]/g, '‹class›').replace(/\$[rR]/g, '‹race›');
+function ctxHTML(l) {
+  const c = l.ctx || {};
+  const who = [c.race && c.race !== 'unknown' ? c.race : '', c.sex && c.sex !== 'unknown' ? c.sex : '', c.ctype ? c.ctype.toLowerCase() : ''].filter(Boolean).join(' ') || 'race unknown';
+  const where = [c.zone, c.title ? `“${esc(c.title)}”` + (c.level ? ` (level ${esc(c.level)})` : '') : ''].filter(Boolean).join(' · ');
+  const line = `<div class="ctx"><b>${esc(who)}</b>${c.subname ? ' &lt;' + esc(c.subname) + '&gt;' : ''}${where ? ' · ' + where : ''} · ${esc(KIND[c.kind] || c.kind || '')}</div>`;
+  const texts = ['accept', 'progress', 'complete'].filter(k => c.texts && c.texts[k]).map(k =>
+    `<div class="qt${k === c.kind ? ' this' : ''}"><span class="k">${k}${k === c.kind ? ' · this line' : ''}</span>${qtext(c.texts[k])}</div>`).join('');
+  const dl = [['Director', c.note], ['Subtext', c.subtext], ['Emotion', c.emotion], ['Actor note', c.actor], ['Voice', c.voice]]
+    .filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+  return line + `<details class="more"><summary>Quest &amp; direction</summary>${texts}<dl class="dl">${dl}</dl></details>`;
+}
+let lines = [], shown = [], sel = 0, fault = 'all', undecidedOnly = false, query = '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+function pauses(line) {
+  // the flagged gaps as [word before, word after, seconds], from "(odd pause: a | b 0.34s; c | d 0.5s)"
+  const m = line.flag.match(/^\(odd pause: (.*)\)$/); if (!m) return [];
+  return m[1].split('; ').map(p => { const x = p.match(/^(.*?) \| (.*) ([\d.]+)s$/); return x ? [x[1], x[2], x[3]] : null; }).filter(Boolean);
+}
+function marked(line) {
+  // the meant text with each flagged gap shown where it falls
+  let html = esc(line.meant);
+  for (const [a, b, s] of pauses(line)) {
+    const norm = w => w.replace(/[^\w']/g, '');
+    const re = new RegExp('(' + norm(a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^\\s]*)(\\s+)(?=[^\\w]*' + norm(b).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i');
+    if (norm(a) && norm(b) && re.test(html)) html = html.replace(re, `$1 <span class="pause" title="flagged pause">⏸ ${s}s</span> `);
+  }
+  return html;
+}
+function rowHTML(l, i) {
+  const [fc, fl] = FAULT[l.fault] || ['', l.fault];
+  const dec = l.decision ? `<span class="badge ${DEC[l.decision][0]}">${DEC[l.decision][1]}${l.decision === 'accept' && l.decision_seed ? ' · seed ' + l.decision_seed : ''}</span>` : '';
+  const extra = l.fault === 'odd pause' ? `${l.gaps.length} gap${l.gaps.length === 1 ? '' : 's'}, longest ${l.max_gap}s` : l.flag ? esc(l.flag.replace(/^\(|\)$/g, '')) : '';
+  const heard = (l.fault === 'low score' || l.fault === 'dropped' || l.fault === 'slow') ? `<div class="heard"><span>Heard:</span> ${esc(l.heard)}</div>` : '';
+  const takes = l.takes.map(t => `<button class="take${t.seed === l.best_seed ? ' best' : ''}" data-seed="${t.seed}" data-file="${esc(t.file)}" title="${esc(t.fault || 'no fault')}">seed ${t.seed} <small>${t.raw.toFixed(3)}${t.fault ? ' · ' + esc(t.fault) : ''}</small></button>`).join('');
+  return `<div class="row${l.decision ? ' decided' : ''}" data-i="${i}" id="r-${esc(l.name)}">
+    <div class="meta"><span class="who">${esc(l.who)}</span><span class="name">${esc(l.name)}</span>
+      <span class="badge ${fc}">${fl}</span><span>raw ${Number(l.score).toFixed(3)}</span><span class="counts">${extra}</span>${dec}</div>
+    ${ctxHTML(l)}<div class="text">${marked(l)}</div>${heard}
+    <div class="controls"><audio controls preload="none" src="/audio/takes/${esc((l.takes.find(t => t.seed === l.best_seed) || l.takes[0] || {}).file || '')}"></audio>
+      <div class="takes">${takes}</div></div>
+    <div class="decide">
+      <button class="btn accept" aria-pressed="${l.decision === 'accept'}">Accept</button>
+      <button class="btn retry" aria-pressed="${l.decision === 'retry'}">Retry</button>
+      <button class="btn closer" aria-pressed="${l.decision === 'look closer'}">Look closer</button>
+      <input class="note" placeholder="Note (optional)" value="${esc(l.note)}"><span class="saved"></span></div></div>`;
+}
+function playing(row) { return Number((row.querySelector('.take.on') || row.querySelector('.take.best') || row.querySelector('.take') || {dataset: {}}).dataset.seed) || null; }
+function render() {
+  shown = lines.filter(l => (fault === 'all' || l.fault === fault) && (!undecidedOnly || !l.decision) &&
+    (!query || (l.who + ' ' + l.name + ' ' + l.meant + ' ' + ((l.ctx || {}).title || '') + ' ' + ((l.ctx || {}).zone || '') + ' ' + ((l.ctx || {}).race || '')).toLowerCase().includes(query)));
+  $('#list').innerHTML = shown.length ? shown.map(rowHTML).join('') : '<div class="empty">Nothing matches.</div>';
+  for (const row of document.querySelectorAll('.row')) {
+    const b = row.querySelector('.take.best') || row.querySelector('.take'); if (b) b.classList.add('on');
+  }
+  sel = Math.min(sel, Math.max(0, shown.length - 1)); select(sel, false); counts();
+}
+function counts() {
+  const by = {accept: 0, retry: 0, 'look closer': 0}; lines.forEach(l => l.decision && by[l.decision]++);
+  const done = by.accept + by.retry + by['look closer'];
+  $('#counts').innerHTML = `<b>${done}</b> of <b>${lines.length}</b> decided · ${by.accept} accepted · ${by.retry} retry · ${by['look closer']} look closer · showing ${shown.length}`;
+  $('#progress').style.width = (lines.length ? 100 * done / lines.length : 0) + '%';
+}
+function select(i, scroll = true) {
+  document.querySelectorAll('.row.sel').forEach(r => r.classList.remove('sel'));
+  const row = document.querySelector(`.row[data-i="${i}"]`); if (!row) return;
+  sel = i; row.classList.add('sel'); if (scroll) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+function stopAll(except) { document.querySelectorAll('audio').forEach(a => { if (a !== except) a.pause(); }); }
+function playTake(row, btn) {
+  const a = row.querySelector('audio'); row.querySelectorAll('.take').forEach(t => t.classList.toggle('on', t === btn));
+  a.src = '/audio/takes/' + btn.dataset.file; stopAll(a); a.play().catch(() => {});
+}
+async function decide(i, decision) {
+  const l = shown[i], row = document.querySelector(`.row[data-i="${i}"]`); if (!l || !row) return;
+  const seed = decision === 'accept' ? playing(row) : null;
+  const note = row.querySelector('.note').value;
+  const body = {name: l.name, decision, seed, note};
+  const r = await fetch('/api/decide', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  const s = row.querySelector('.saved');
+  if (!r.ok) { s.textContent = 'not saved'; return; }
+  l.decision = decision; l.decision_seed = seed; l.note = note;
+  const html = rowHTML(l, i), tmp = document.createElement('div'); tmp.innerHTML = html; const fresh = tmp.firstElementChild;
+  fresh.querySelectorAll('.take').forEach(t => t.classList.toggle('on', Number(t.dataset.seed) === (seed || l.best_seed)));
+  row.replaceWith(fresh); fresh.querySelector('.saved').textContent = 'saved'; counts();
+  if (decision && i + 1 < shown.length) select(i + 1); else select(i);
+}
+async function saveNote(i) {
+  const l = shown[i], row = document.querySelector(`.row[data-i="${i}"]`); const note = row.querySelector('.note').value;
+  if (note === (l.note || '')) return;
+  const r = await fetch('/api/decide', {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name: l.name, decision: l.decision, seed: l.decision_seed, note})});
+  row.querySelector('.saved').textContent = r.ok ? 'note saved' : 'not saved'; if (r.ok) l.note = note;
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('#compare')) return;
+  const row = e.target.closest('.row'); if (row) select(Number(row.dataset.i), false);
+  if (e.target.closest('.take')) return playTake(row, e.target.closest('.take'));
+  const b = e.target.closest('.btn'); if (b && row) {
+    const i = Number(row.dataset.i), d = b.classList.contains('accept') ? 'accept' : b.classList.contains('retry') ? 'retry' : 'look closer';
+    return decide(i, shown[i].decision === d ? null : d);
+  }
+  const chip = e.target.closest('.chip');
+  if (chip && chip.id === 'undecided') { undecidedOnly = !undecidedOnly; chip.setAttribute('aria-pressed', undecidedOnly); sel = 0; render(); }
+  else if (chip) { fault = chip.dataset.f; document.querySelectorAll('.chip[data-f]').forEach(c => c.setAttribute('aria-pressed', c === chip)); sel = 0; render(); }
+});
+document.addEventListener('play', e => stopAll(e.target), true);
+document.addEventListener('focusout', e => { if (e.target.classList?.contains('note') && e.target.closest('.row')) saveNote(Number(e.target.closest('.row').dataset.i)); });
+$('#search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); sel = 0; render(); });
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input')) { if (e.key === 'Escape' || e.key === 'Enter') e.target.blur(); return; }
+  if (tab !== 'lines') return;
+  const row = document.querySelector(`.row[data-i="${sel}"]`); if (!row) return;
+  const k = e.key;
+  if (k === 'j') select(Math.min(sel + 1, shown.length - 1));
+  else if (k === 'k') select(Math.max(sel - 1, 0));
+  else if (k === ' ') { e.preventDefault(); const a = row.querySelector('audio'); if (a.paused) { stopAll(a); a.play().catch(() => {}); } else a.pause(); }
+  else if (/^[1-9]$/.test(k)) { const b = row.querySelector(`.take[data-seed="${k}"]`); if (b) playTake(row, b); }
+  else if (k === 'a') decide(sel, 'accept');
+  else if (k === 'r') decide(sel, 'retry');
+  else if (k === 'l') decide(sel, 'look closer');
+  else if (k === 'c') { const d = row.querySelector('details.more'); if (d) d.open = !d.open; }
+  else if (k === 'u') decide(sel, null);
+  else if (k === 'n') { e.preventDefault(); row.querySelector('.note').focus(); }
+  else return;
+});
+// ---- the Voice tests tab's player (one clip at a time)
+let tab = 'lines';
+const player = new Audio();
+function playSnort(btn) {
+  document.querySelectorAll('.btn.playing').forEach(b => b.classList.remove('playing'));
+  if (!player.paused && player.dataset.src === btn.dataset.src) { player.pause(); return; }
+  stopAll(); player.src = btn.dataset.src; player.dataset.src = btn.dataset.src; btn.classList.add('playing'); player.play().catch(() => {});
+}
+player.addEventListener('ended', () => document.querySelectorAll('.btn.playing').forEach(b => b.classList.remove('playing')));
+document.querySelector('.tabs').addEventListener('click', e => {
+  const t = e.target.closest('.tab'); if (!t) return; tab = t.dataset.tab;
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  $('#list').classList.toggle('hidden', tab !== 'lines'); $('#lineTools').classList.toggle('hidden', tab !== 'lines');
+  $('#compare').classList.toggle('hidden', tab !== 'compare'); stopAll(); player.pause();
+  if (tab === 'compare' && !cmp) loadCompare().catch(() => { $('#compare').innerHTML = '<div class="empty">Could not load the voice tests.</div>'; });
+});
+// ---- Ours vs pack (2026-10-29): the voices whose pack recordings the release cannot ship, ours beside the pack's
+let cmp = null;
+function compareHTML() {
+  const d = cmp, p = d.pick || {}, V = p.voices || {}, L = p.lines || {};
+  if (!d.lines.length) return '<div class="empty">No voice tests waiting.</div>';
+  return     d.groups.map(g => { const ls = d.lines.filter(x => x.group === g), v = V[g] || {};
+      if (!ls.length) return '';
+      // a voice grid (2026-10-30, the blood elf women's player voice): one line per pitch/formant cell, good or not
+      if (ls.some(x => x.cell)) { const S = p.stops || {};
+        return `<h2>${esc(g)} (${ls.length})</h2><p class="snote">${esc((d.notes || {})[g] || '')}</p>` +
+        ls.map(x => `<div class="sn"><div class="src"><b>${esc(x.who)}</b></div>
+        <div class="plays"><button class="btn" data-src="/compare/${esc(x.name)}.grid.mp3">▶ Play</button>${[['good', 'Good'], ['bad', 'No']].map(([k, t]) =>
+          `<button class="btn use" data-line="${esc(x.name)}" data-verdict="${k}" aria-pressed="${S[x.name] === k}">${t}</button>`).join('')}
+        <input class="note cnote" data-line="${esc(x.name)}" placeholder="Note" value="${esc(L[x.name] || '')}"></div></div>`).join(''); }
+      // a voice test (2026-10-30, Magistrix Erona): one line several ways, listen and note
+      if (ls.some(x => x.arms)) return `<h2>${esc(g)} (${ls.length})</h2><p class="snote">${esc((d.notes || {})[g] || '')}</p>` +
+        ls.map(x => `<div class="sn"><div class="src"><b>${esc(x.who)}</b> <small>${esc(x.name)}</small><br>${esc(x.text)}</div>
+        <div class="plays">${x.arms.map(([k, t]) => `<button class="btn" data-src="/compare/${esc(x.name)}.${k}.mp3">▶ ${esc(t)}</button>`).join('')}
+        <input class="note cnote" data-line="${esc(x.name)}" placeholder="Note on this line" value="${esc(L[x.name] || '')}"></div></div>`).join('');
+      // the missed-stop test (2026-10-30): the take as it is, and with a pause spliced in where the stop was read through
+      if (ls.some(x => x.stops)) { const S = p.stops || {};
+        return `<h2>${esc(g)} (${ls.length})</h2><p class="snote">Stops the new check says the voice reads straight through (marked ‖). Each line: the take as it is now, and the same take with a pause spliced in at the mark, as long as this speaker’s own other stops. Per line: <b>Splice works</b> (the pause sounds natural), <b>Needs a retake</b> (the splice sounds wrong, or the run-through is still heard), or <b>Was fine</b> (no run-through in the original: a false catch). The first two are your Helion and Sunstrider Isle examples.</p>` +
+        ls.map(x => `<div class="sn"><div class="src"><b>${esc(x.who)}</b> <small>${esc(x.name)} · pause ${x.pause} s</small><br>${x.stops.map(m => `<b>…${esc(m)}…</b>`).join('<br>')}<br><small>${esc(x.text)}</small></div>
+        <div class="plays"><button class="btn" data-src="/compare/${esc(x.name)}.ours.mp3">▶ As it is</button><button class="btn" data-src="/compare/${esc(x.name)}.spliced.mp3">▶ With the pause</button></div>
+        <div class="plays" style="display:flex;gap:6px;margin:6px 0">${[['splice', 'Splice works'], ['retake', 'Needs a retake'], ['fine', 'Was fine']].map(([k, t]) =>
+          `<button class="btn use" data-line="${esc(x.name)}" data-verdict="${k}" aria-pressed="${S[x.name] === k}">${t}</button>`).join('')}</div>
+        <input class="note cnote" data-line="${esc(x.name)}" placeholder="Note on this line" value="${esc(L[x.name] || '')}"></div>`).join(''); }
+      // a group with no pack takes (the chat-text samples) is only for listening: no verdict, no pack button
+      if (!ls.some(x => x.pack)) return `<h2>${esc(g)} (${ls.length})</h2><p class="snote">${esc((d.notes || {})[g] || 'New lines, no pack version: what a quest giver says when you talk to them. Already through the speech check. A note on any line that is wrong.')}</p>` +
+        ls.map(x => `<div class="sn"><div class="src"><b>${esc(x.who)}</b> <small>${esc(x.name)}</small><br>${esc(x.text)}</div>
+        <div class="plays"><button class="btn" data-src="/compare/${esc(x.name)}.ours.mp3">▶ Ours</button>
+        <input class="note cnote" data-line="${esc(x.name)}" placeholder="Note on this line" value="${esc(L[x.name] || '')}"></div></div>`).join('');
+      return `<h2>${esc(g)} (${ls.length})</h2>
+      <div class="plays" style="display:flex;gap:6px;margin-bottom:8px"><button class="btn use" data-group="${esc(g)}" data-verdict="ours" aria-pressed="${v.verdict === 'ours'}">Ours will do</button><button class="btn use" data-group="${esc(g)}" data-verdict="pack" aria-pressed="${v.verdict === 'pack'}">Keep the pack</button></div>
+      <input class="note cnote" data-group="${esc(g)}" placeholder="Note on this voice" value="${esc(v.note || '')}">` +
+      ls.map(x => `<div class="sn"><div class="src"><b>${esc(x.who)}</b> <small>${esc(x.name)} · ${esc(x.pack)}</small><br>${esc(x.text)}</div>
+        <div class="plays"><button class="btn" data-src="/compare/${esc(x.name)}.ours.mp3">▶ Ours${x.new ? ' (old)' : ''}</button><button class="btn" data-src="/compare/${esc(x.name)}.pack.mp3">▶ Pack</button>${x.new ? `<button class="btn" data-src="/compare/${esc(x.name)}.new.mp3">▶ Ours (new: her own pack voice)</button>` : ''}
+        <input class="note cnote" data-line="${esc(x.name)}" placeholder="Note on this line" value="${esc(L[x.name] || '')}"></div></div>`).join(''); }).join('');
+}
+async function loadCompare() { cmp = await (await fetch('/api/compare')).json(); $('#compare').innerHTML = compareHTML(); }
+async function saveCompare(body) {
+  const r = await fetch('/api/compare', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  if (r.ok) { cmp.pick = await r.json(); return true; }
+}
+$('#compare').addEventListener('click', async e => {
+  const b = e.target.closest('.btn'); if (!b) return;
+  if (b.dataset.src) return playSnort(b);
+  if (b.dataset.verdict && b.dataset.line) { const cur = (cmp.pick.stops || {})[b.dataset.line];
+    if (await saveCompare({line: b.dataset.line, verdict: cur === b.dataset.verdict ? null : b.dataset.verdict})) $('#compare').innerHTML = compareHTML(); return; }
+  if (b.dataset.verdict) { const cur = ((cmp.pick.voices || {})[b.dataset.group] || {}).verdict;
+    if (await saveCompare({group: b.dataset.group, verdict: cur === b.dataset.verdict ? null : b.dataset.verdict})) $('#compare').innerHTML = compareHTML(); }
+});
+$('#compare').addEventListener('focusout', e => {
+  const t = e.target; if (!t.classList.contains('cnote')) return;
+  saveCompare(t.dataset.group ? {group: t.dataset.group, note: t.value} : {line: t.dataset.line, note: t.value});
+});
+fetch('/api/lines').then(r => r.json()).then(d => { lines = d; render(); })
+  .catch(() => { $('#list').innerHTML = '<div class="empty">Could not load the review lines. Is review_server.py running?</div>'; });
+</script>
+</body>
+</html>

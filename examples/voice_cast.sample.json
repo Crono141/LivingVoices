@@ -1,0 +1,26 @@
+{
+ "197": {
+  "name": "Marshal McBride",
+  "race": "Human",
+  "sex": "male",
+  "description": "A mature male soldier in his late 30s with a sturdy Midlands accent. The voice is mid-range, authoritative yet warm, carrying a grounded texture of grit and steady breath. He speaks with a measured, encouraging pace, sounding reliable and seasoned rather than overly polished.",
+  "reference_text": "Your first task is one of cleansing, adventurer. A clan of kobolds have infested the woods to the north. Go there and fight the kobold vermin you find. Reduce their numbers so that we may one day drive them from Northshire.",
+  "lines": 11
+ },
+ "196": {
+  "name": "Eagan Peltskinner",
+  "race": "Human",
+  "sex": "male",
+  "description": "Adult male with a rural West Country accent. The pitch is mid-range with a grounded, warm timbre. His voice carries a slight breathy texture and a somber, earnest quality. He speaks at a steady, deliberate pace, sounding polite yet weathered by the outdoors.",
+  "reference_text": "Whatever is affecting these wolves isn't going away. Each day that passes brings forth more sick wolves. It pains me to ask anyone to kill nature's beasts, but we must destroy the diseased young wolves before this little outbreak turns into an epidemic.",
+  "lines": 4
+ },
+ "823": {
+  "name": "Deputy Willem",
+  "race": "Human",
+  "sex": "male",
+  "description": "Adult male with a Midlands accent. Mid-range pitch with a grounded, sturdy timbre. The voice is textured with a slight grit and breathy warmth. He speaks at a steady, deliberate pace with an earnest, conversational manner that feels practical rather than performative.",
+  "reference_text": "Garrick Padfoot - a cutthroat who's plagued our farmers and merchants for weeks - was seen at a shack near the vineyards, which lies east of the Abbey and across the bridge. Bring me the villain's head, and earn his bounty! But be wary, adventurer. Garrick has gathered a gang of thugs around him.",
+  "lines": 9
+ }
+}

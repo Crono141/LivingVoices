@@ -1,0 +1,35 @@
+# ---- this machine
+config.local.json
+.venv
+.lib/
+.comfy2
+.comfy3
+__pycache__/
+*.pyc
+
+# ---- data/: everything a run makes or extracts stays local. It holds the game's quest text, NPC names and casting,
+# audio cut from the client, renders, and the voices designed for this realm's NPCs -- none of it is published here.
+# Each file is described in README.md (what makes it, from what). examples/ holds a small sample of the formats.
+# Tracked: the rules and settings the pipeline reads.
+data/*
+!data/pronounce.json
+!data/morphs.json
+!data/sfx.json
+!data/stretch.json
+!data/variant_beats.json
+!data/packs.json
+!data/game_ref_override.json
+!data/sound_lines.json
+!data/text_fixes.json
+
+# ---- client builds
+client/release
+client/build/
+client/dist/
+*.dll
+*.zip
+*.MPQ
+
+# realm database edits (quest text fixes, placeholder texts) and the old project page: local only
+sql/
+page/

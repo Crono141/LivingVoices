@@ -1,0 +1,82 @@
+{
+ "Centuriesss": {
+  "say": "centuries",
+  "sound": "s",
+  "at": "end",
+  "factor": 4.0
+ },
+ "Ssstrike": {
+  "say": "strike",
+  "sound": "s",
+  "at": "start",
+  "factor": 4.0
+ },
+ "misssery": {
+  "say": "misery",
+  "sound": "s",
+  "at": "any",
+  "factor": 4.0
+ },
+ "sorrrrrowful": {
+  "say": "sorrowful",
+  "sound": "r",
+  "at": "start",
+  "factor": 3.0
+ },
+ "errorrrr": {
+  "say": "error",
+  "sound": "r",
+  "at": "end",
+  "factor": 3.0
+ },
+ "peacccce": {
+  "say": "peace",
+  "sound": "s",
+  "at": "end",
+  "factor": 4.0
+ },
+ "muuuussst": {
+  "say": "must",
+  "sound": "u",
+  "at": "any",
+  "factor": 3.0
+ },
+ "returrrned": {
+  "say": "returned",
+  "sound": "r",
+  "at": "end",
+  "factor": 3.0
+ },
+ "Hsssssssssssss": {
+  "say": "hiss",
+  "sound": "s",
+  "at": "end",
+  "factor": 6.0
+ },
+ "Changesss": {
+  "say": "changes",
+  "sound": "s",
+  "at": "end",
+  "factor": 4.0
+ },
+ "ssseveral": {
+  "say": "several",
+  "sound": "s",
+  "at": "start",
+  "factor": 4.0
+ },
+ "Sssuch": {
+  "say": "such",
+  "sound": "s",
+  "at": "start",
+  "factor": 4.0
+ },
+ "Sseratus": {
+  "say": "sehrahtus",
+  "match": "seratus",
+  "sound": "s",
+  "at": "start",
+  "factor": 2.0,
+  "why": "2026-10-18, the producer: the S held too long and with artifacts at 4x -- a double s in a name, not a hiss: 2x"
+ }
+}

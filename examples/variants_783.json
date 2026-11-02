@@ -1,0 +1,82 @@
+{
+ "783-accept_s0_warrior": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "warrior",
+  "text": "I hope you strapped your belt on tight, young warrior, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_paladin": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "paladin",
+  "text": "I hope you strapped your belt on tight, young paladin, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_hunter": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "hunter",
+  "text": "I hope you strapped your belt on tight, young hunter, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_rogue": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "rogue",
+  "text": "I hope you strapped your belt on tight, young rogue, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_priest": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "priest",
+  "text": "I hope you strapped your belt on tight, young priest, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_death_knight": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "death_knight",
+  "text": "I hope you strapped your belt on tight, young death knight, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_shaman": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "shaman",
+  "text": "I hope you strapped your belt on tight, young shaman, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_mage": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "mage",
+  "text": "I hope you strapped your belt on tight, young mage, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_warlock": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "warlock",
+  "text": "I hope you strapped your belt on tight, young warlock, because there is work to do here in Northshire."
+ },
+ "783-accept_s0_druid": {
+  "base": "783-accept",
+  "i": 0,
+  "beat": 0,
+  "tok": "C",
+  "word": "druid",
+  "text": "I hope you strapped your belt on tight, young druid, because there is work to do here in Northshire."
+ }
+}

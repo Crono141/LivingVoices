@@ -1,0 +1,19 @@
+{
+ "whir": "sfx/whir.wav",
+ "click": "sfx/click.wav",
+ "zzzap": "sfx/zzzap.wav",
+ "bzzzz": "sfx/bzzzz.wav",
+ "thud": "sfx/thud.wav",
+ "snort": "sfx/snort.wav",
+ "cluck": "cycle:sfx/cluck1.wav,sfx/cluck2.wav,sfx/cluck3.wav",
+ "bacaw": "cycle:sfx/bacaw1.wav,sfx/bacaw2.wav",
+ "click-click": "twice:click",
+ "sniff": "emote:cry",
+ "sigh": "emote:sigh",
+ "yawn": "emote:yawn",
+ "hic": "say:Hic!",
+ "cough": "drop",
+ "gasp": "drop",
+ "grin": "say:Heh heh heh.",
+ "my": "word"
+}

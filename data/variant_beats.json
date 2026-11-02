@@ -1,0 +1,15 @@
+{
+ "_note": "race/class clips: '<line>_s<i>_<word>' (one clip) or '<line>_s<i>' (every race/class of that sentence) -> beat fields that replace the beat's own for the clip alone (overnight.work). A three-word clip takes its whole beat's emotion at full strength; the take spreads it over the line. Added 2026-11-02 from the producer's review notes.",
+ "12509-complete_s0": {
+  "emotion": "plain, level approval of a job done; calm and dry, no laughter",
+  "intensity": 3
+ },
+ "11585-accept_s0": {
+  "emotion": "a gruff orc officer's hearty, deep-chested greeting between warriors",
+  "intensity": 4
+ },
+ "12137-accept_s1_draenei_hunter": {
+  "emotion": "warm but hushed reverence, grounded and calm; a spirit speaking softly of rest, not cheerful",
+  "intensity": 3
+ }
+}

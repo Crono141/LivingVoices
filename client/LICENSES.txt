@@ -1,0 +1,19 @@
+LIVING VOICES -- what is whose
+===============================
+Quest text, characters and the game's own recordings: (c) Blizzard Entertainment. Every line is synthesized for this
+realm with IndexTTS-2 (bilibili). About half the speakers' voices are cloned from the game's own recordings of that
+race or character, a quarter are designed from a description, and the rest are cloned from the voices of earlier fan
+voice-over packs (SpeakStone by dandwhelan, Spoken Quests by Rusty Key) -- with thanks; none of their recordings are
+included. The few sound effects (snorts, yawns, sighs) are cut from the game client. This is a fan work, not affiliated with,
+endorsed by or sponsored by Blizzard Entertainment, and not for sale.
+
+LivingVoices.dll (the playback engine) and the LivingVoices add-on: written for the realm. Source: src/.
+  Uses miniaudio by David Reid (public domain or MIT No Attribution, at your choice) -- https://miniaud.io
+  Uses StormLib by Ladislav Zezula (MIT) -- https://github.com/ladislav-zezula/StormLib -- to read
+  LivingVoices.MPQ; StormLib bundles zlib (Jean-loup Gailly and Mark Adler, zlib licence), bzip2 (Julian Seward,
+  BSD-style licence), LibTomCrypt and LibTomMath (Tom St Denis, public domain) and LZMA (Igor Pavlov, public domain).
+
+LivingVoicesPatcher.exe and patch_wowexe.py: apply the Wow.exe patch from awesome_wotlk by FrostAtom
+(https://github.com/FrostAtom/awesome_wotlk, src/AwesomeWotlkPatch/Patch.h), licensed GPL-3.0, with this engine's
+DLL name in place of theirs. They are therefore GPL-3.0 too (https://www.gnu.org/licenses/gpl-3.0.html); their
+source is in src/ (LivingVoicesPatcher.cpp, patch_bytes.h) and patch_wowexe.py is its own source.
