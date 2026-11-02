@@ -82,8 +82,12 @@ PlaySpliced` to the game's Lua. The stock `Wow.exe` loads it after a patch from
 
 The add-on speaks the offer, progress and turn-in text, and a quest giver's chat text. It waits 1.5 s so it does not
 talk over the NPC's own greeting, and it fades out when the window closes or you walk away. A full-bags turn-in that
-closes and reopens the window does not cut the line. `/lv bad <note>` reports the line just heard to the realm
-(`server/`), where it is queued for retakes.
+closes and reopens the window does not cut the line.
+
+**Reporting a bad line.** `/lv bad <note>` reports the line just heard. A realm running `server/` takes the report
+itself. On any other realm the add-on opens a box with a link to this repository's
+[Bad voice line](../../issues/new?template=bad-line.yml) form, already filled in, to copy into a browser.
+`tools/import_reports.py` reads both sources and queues each reported line for six fresh takes.
 
 **What we tried.** The community VoiceOver add-on plays voices as music and stops them by playing silence, and its
 stop-on-close option is off by default. We proposed cutting each line into 1-2 s files so the add-on could stop

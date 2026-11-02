@@ -18,7 +18,7 @@ local heardAt = {}                 -- chat line -> GetTime() when it last stoppe
 local lastNpc, lastTitle           -- who spoke the last line started, and its quest (for /lv bad)
 local function heard(label, t) lastEnded = t; if label:find("-gossip", 1, true) then heardAt[label] = t end end
 
-local ADDON_VERSION = "1.1.1"
+local ADDON_VERSION = "1.1.2"
 local function say(msg) DEFAULT_CHAT_FRAME:AddMessage("|cff88ccffLiving Voices:|r " .. msg) end
 local function dbg(msg)
     if LivingVoicesDB and LivingVoicesDB.debug then
@@ -251,6 +251,7 @@ end
 -- is also kept in LivingVoicesReports (account-wide SavedVariables) until the realm confirms it, and one still
 -- unconfirmed is sent again at the next login or with "/lv reports send" (the first report ever made went out before
 -- the realm had the script).
+local askAt, askFor                  -- when to offer the GitHub link, and for which report (/lv bad, below)
 local outbox, nextSend, loginSent = {}, 0, false      -- reports waiting to go out, 2.5 s apart (the realm takes one per 2 s)
 
 local function sendReport(r)
@@ -276,10 +277,66 @@ local function report(note)
                 at = date("%Y-%m-%d %H:%M:%S"), zone = GetRealZoneText() or "", v = ADDON_VERSION }
     table.insert(LivingVoicesReports, r); table.insert(outbox, r)
     say(("reporting %s%s%s ..."):format(line, lastNpc and (" (" .. lastNpc .. ")") or "", note ~= "" and (': "' .. note .. '"') or ""))
+    askFor, askAt = r, GetTime() + 6 + 2.5 * #outbox    -- the realm answers within a second; nothing by then: GitHub
 end
 
 local function confirmed(key)
     for _, r in ipairs(LivingVoicesReports or {}) do if r.at == key then r.sent = true end end
+end
+
+-- (2026-11-02, the producer) on a realm without the report script nothing confirms a report: after 6 s the add-on
+-- shows a link to the project's GitHub issue form, filled in with the report, to copy (Ctrl+C) into a browser. WoW's
+-- chat cannot be copied from, an edit box can. "/lv reports copy" does the same for every unconfirmed report.
+local ISSUES = "https://github.com/Crono141/LivingVoices/issues/new?template=bad-line.yml"
+local function urlenc(s)
+    return (tostring(s or ""):gsub("[^%w%-%._~]", function(c) return ("%%%02X"):format(c:byte()) end))
+end
+local function issueURL(r, more)
+    local u = ISSUES .. "&title=" .. urlenc("Bad line: " .. r.line) .. "&line=" .. urlenc(r.line)
+        .. "&note=" .. urlenc(r.note or "") .. "&npc=" .. urlenc(r.npc or "") .. "&quest=" .. urlenc(r.title or "")
+        .. "&zone=" .. urlenc(r.zone or "") .. "&version=" .. urlenc(r.v or ADDON_VERSION)
+    if more and more ~= "" then u = u .. "&more=" .. urlenc(more) end
+    return u
+end
+local copyFrame
+local function showCopy(text, title)
+    if not copyFrame then
+        local f = CreateFrame("Frame", "LivingVoicesCopyFrame", UIParent)
+        f:SetWidth(580); f:SetHeight(130); f:SetPoint("CENTER", 0, 140); f:SetFrameStrata("DIALOG")
+        f:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+                        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32,
+                        insets = { left = 11, right = 12, top = 12, bottom = 11 } })
+        f:EnableMouse(true); f:SetMovable(true); f:RegisterForDrag("LeftButton")
+        f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
+        f.title = f:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+        f.title:SetPoint("TOP", 0, -20); f.title:SetWidth(540)
+        local eb = CreateFrame("EditBox", "LivingVoicesCopyBox", f, "InputBoxTemplate")
+        eb:SetWidth(520); eb:SetHeight(20); eb:SetPoint("TOP", f.title, "BOTTOM", 0, -12)
+        eb:SetAutoFocus(true); eb:SetMaxLetters(0)
+        eb:SetScript("OnEscapePressed", function() f:Hide() end)
+        eb:SetScript("OnEnterPressed", function() f:Hide() end)
+        eb:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+        eb:SetScript("OnTextChanged", function(self) if self:GetText() ~= f.text then self:SetText(f.text); self:HighlightText() end end)
+        f.eb = eb
+        local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+        b:SetWidth(90); b:SetHeight(22); b:SetPoint("BOTTOM", 0, 16); b:SetText(CLOSE or "Close")
+        b:SetScript("OnClick", function() f:Hide() end)
+        tinsert(UISpecialFrames, "LivingVoicesCopyFrame")       -- Escape closes it
+        copyFrame = f
+    end
+    copyFrame.text = text; copyFrame.title:SetText(title); copyFrame:Show()
+    copyFrame.eb:SetText(text); copyFrame.eb:SetFocus(); copyFrame.eb:HighlightText()
+end
+local function offerGitHub(list)
+    if #list == 0 then say("no report to copy.") return end
+    local more = {}
+    for i = 2, #list do
+        local r = list[i]
+        table.insert(more, ("%s | %s | %s"):format(r.line, r.npc or "", r.note or ""))
+    end
+    showCopy(issueURL(list[1], table.concat(more, "\n")),
+        "This realm does not collect Living Voices reports. Press Ctrl+C to copy the link, paste it into your\n"
+        .. "browser and submit the form on GitHub. Thank you!" .. (#list > 1 and ("\n(" .. #list .. " reports in one)") or ""))
 end
 
 frame:SetScript("OnEvent", function(_, event, ...)
@@ -338,6 +395,10 @@ frame:SetScript("OnUpdate", function(_, dt)
     if stopAt and GetTime() >= stopAt then stopAt = nil; dbg("deferred stop fires"); stop() end
     if pending and GetTime() >= pendingAt then local k = pending; pending = nil; play(k) end
     if outbox[1] and GetTime() >= nextSend then sendReport(table.remove(outbox, 1)); nextSend = GetTime() + 2.5 end
+    if askAt and GetTime() >= askAt then
+        local r = askFor; askAt, askFor = nil, nil
+        if r and not r.sent then offerGitHub({ r }) end
+    end
     elapsed = elapsed + dt
     if elapsed < 0.25 then return end
     elapsed = 0
@@ -360,6 +421,12 @@ SlashCmdList.LIVINGVOICES = function(msg)
             r[i].sent and "(on the realm)" or "(not confirmed yet)")) end
         return
     elseif msg == "reports send" then say(("sending %d unconfirmed report(s)."):format(queueUnsent())) return
+    elseif msg == "reports copy" then
+        local list = {}
+        for _, r in ipairs(LivingVoicesReports or {}) do if not r.sent then table.insert(list, r) end end
+        -- every report taken by the realm: the latest one, to file on GitHub as well
+        if #list == 0 and LivingVoicesReports and #LivingVoicesReports > 0 then list = { LivingVoicesReports[#LivingVoicesReports] } end
+        offerGitHub(list) return
     elseif msg == "reports clear" then LivingVoicesReports = {}; outbox = {}; say("reports cleared.") return end
     if msg == "stop" then stop(); say("stopped.")
     elseif msg == "on" or msg == "off" then
@@ -394,6 +461,6 @@ SlashCmdList.LIVINGVOICES = function(msg)
                 p and ("playing %s %.1f/%.1fs"):format(playing or "?", pos, len) or "idle"))
         end
     else
-        say("/lv on / off | stop | volume <0-100> | test | status | debug | bad <note> | reports [send | clear]")
+        say("/lv on / off | stop | volume <0-100> | test | status | debug | bad <note> | reports [send | copy | clear]")
     end
 end

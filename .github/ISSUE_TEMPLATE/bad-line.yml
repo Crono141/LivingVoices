@@ -1,0 +1,46 @@
+name: Bad voice line
+description: A line that sounds wrong in game. Type /lv bad <what's wrong> right after it plays; the add-on fills this in for you.
+title: "Bad line: "
+labels: ["bad line"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for listening! The fastest way to report is in game: type `/lv bad` and a few words while the line plays
+        (or right after). The add-on opens a box with a link to this form, already filled in. Press Ctrl+C, paste it
+        into your browser and submit.
+  - type: input
+    id: line
+    attributes:
+      label: Line
+      description: The line's name, as /lv bad shows it (e.g. 783-accept or 12137-accept_s1_draenei_hunter).
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: What's wrong
+      description: A wrong word or name, an odd pause, the wrong voice, too fast or slow, a sound that doesn't fit...
+    validations:
+      required: true
+  - type: input
+    id: npc
+    attributes:
+      label: Speaker
+  - type: input
+    id: quest
+    attributes:
+      label: Quest
+  - type: input
+    id: zone
+    attributes:
+      label: Zone
+  - type: input
+    id: version
+    attributes:
+      label: Add-on version
+  - type: textarea
+    id: more
+    attributes:
+      label: More lines
+      description: Other lines you reported (from /lv reports copy), one per row.

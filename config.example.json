@@ -28,5 +28,7 @@
  "_llm_url": "OpenAI-compatible chat server (llama.cpp's llama-server) running the director/judge model; 8 parallel slots used overnight.",
  "llm_model": "gemma4-12b",
  "llm_pinned": ["gemma4-12b", "current"],
- "judge_url": ""
+ "judge_url": "",
+ "_github_repo": "owner/repo whose \"bad line\" issues import_reports.py reads (gh CLI, logged in). Empty: none.",
+ "github_repo": ""
 }

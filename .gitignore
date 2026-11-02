@@ -33,3 +33,4 @@ client/dist/
 # realm database edits (quest text fixes, placeholder texts) and the old project page: local only
 sql/
 page/
+luac.out

@@ -22,8 +22,9 @@ Settings:
  - /lv on | off     turn it on or off      /lv volume 0-100   voice volume
  - /lv stop         cut the line playing   /lv test           play a test line
  - /lv status       engine and add-on state
- - /lv bad <note>   report the line just played (on realms that collect reports: the server/ folder of the
-                    project; elsewhere the report is kept in your SavedVariables)
+ - /lv bad <note>   report the line just played, while it plays or right after. A realm that collects reports
+                    takes it at once; anywhere else a box opens with a link to the project's GitHub form, filled
+                    in: Ctrl+C, paste it into your browser, submit. /lv reports copy does it again later.
 
 Undo: run LivingVoicesPatcher.exe again and answer y (Wow.exe goes back to the original), then delete
 LivingVoices.dll and Interface\AddOns\LivingVoices.
