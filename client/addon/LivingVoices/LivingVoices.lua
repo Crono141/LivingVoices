@@ -292,7 +292,8 @@ local function urlenc(s)
     return (tostring(s or ""):gsub("[^%w%-%._~]", function(c) return ("%%%02X"):format(c:byte()) end))
 end
 local function issueURL(r, more)
-    local u = ISSUES .. "&title=" .. urlenc("Bad line: " .. r.line) .. "&line=" .. urlenc(r.line)
+    -- the note goes in the title as well: GitHub fills a form's one-line fields from the link reliably
+    local u = ISSUES .. "&title=" .. urlenc("Bad line: " .. r.line .. (r.note and (" -- " .. r.note) or "")) .. "&line=" .. urlenc(r.line)
         .. "&note=" .. urlenc(r.note or "") .. "&npc=" .. urlenc(r.npc or "") .. "&quest=" .. urlenc(r.title or "")
         .. "&zone=" .. urlenc(r.zone or "") .. "&version=" .. urlenc(r.v or ADDON_VERSION)
     if more and more ~= "" then u = u .. "&more=" .. urlenc(more) end

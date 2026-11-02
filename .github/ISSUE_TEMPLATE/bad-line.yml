@@ -16,7 +16,7 @@ body:
       description: The line's name, as /lv bad shows it (e.g. 783-accept or 12137-accept_s1_draenei_hunter).
     validations:
       required: true
-  - type: textarea
+  - type: input
     id: note
     attributes:
       label: What's wrong
@@ -43,4 +43,4 @@ body:
     id: more
     attributes:
       label: More lines
-      description: Other lines you reported (from /lv reports copy), one per row.
+      description: Other lines you reported (from /lv reports copy), one per row, or anything else to add.
