@@ -10,7 +10,10 @@
 //                                                             voice in the background like the game's own sound)
 //   LivingVoices.PlaySpliced(path, from1, to1, clip1, ...)    (0.4) the line with each clip in place of take[from:to]
 //                                                             (ms): its race/class sentences (lv_splice.h)
-//   LivingVoices.Version                                     "0.4"
+//   LivingVoices.Version                                     "0.5"
+//
+// (0.5) A separate module, cv_module.h, serves the CompanionVoice add-on (its own mod): the global
+// CompanionVoiceEngine, speech for party and whisper chat from a helper process. Living Voices never calls it.
 //
 // (0.3, pack 1.1.0) Play() takes a loose file if there is one, else the line from the add-on folder's MPQ archives
 // (lv_pack.h, StormLib): read into memory and streamed through miniaudio's decoder.
@@ -355,6 +358,9 @@ static int __cdecl L_IsForeground(lua_State *L)
     return 1;
 }
 
+// ---------------------------------------------------------------- the Companion Voice module (its own add-on)
+#include "cv_module.h"
+
 // ---------------------------------------------------------------- registration
 extern "C" void __cdecl LivingVoices_OpenLib()
 {
@@ -367,9 +373,10 @@ extern "C" void __cdecl LivingVoices_OpenLib()
     lua_pushcclosure(L, L_SetVolume, 0); lua_setfield(L, -2, "SetVolume");
     lua_pushcclosure(L, L_IsPlaying, 0); lua_setfield(L, -2, "IsPlaying");
     lua_pushcclosure(L, L_IsForeground, 0); lua_setfield(L, -2, "IsForeground");
-    lua_pushstring(L, "0.4");            lua_setfield(L, -2, "Version");
+    lua_pushstring(L, "0.5");            lua_setfield(L, -2, "Version");
     lua_setfield(L, LUA_GLOBALSINDEX, "LivingVoices");
     if (g_engineOk) StopCurrent(0);                                       // a /reload cuts any line still playing
+    CompanionVoice_OpenLib(L);
 }
 
 // Replaces the `ret` at the end of Lua_OpenFrameXMLApi: keep every register, open our library, return as before.
@@ -403,7 +410,7 @@ static bool Install()
     *(DWORD *)(site + 1) = (DWORD)(void *)&LivingVoices_Hook - (HOOK_LUA_OPEN_FRAMEXML_TAIL + 5);
     VirtualProtect(site, 5, old, &old);
     FlushInstructionCache(GetCurrentProcess(), site, 5);
-    logf("installed (LivingVoices 0.4, miniaudio %s, StormLib %s)", MA_VERSION_STRING, STORMLIB_VERSION_STRING);
+    logf("installed (LivingVoices 0.5, miniaudio %s, StormLib %s)", MA_VERSION_STRING, STORMLIB_VERSION_STRING);
     return true;
 }
 
